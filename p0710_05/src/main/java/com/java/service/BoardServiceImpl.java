@@ -16,10 +16,8 @@ public class BoardServiceImpl implements BoardService {
 	
 	@Override
 	public ArrayList<BoardDto> selectList() {
-		
 		ArrayList<BoardDto> list = boardMapper.selectList();
 		System.out.println("serviceImpl list: "+list.size());
-		
 		return list;
 	}
 	
