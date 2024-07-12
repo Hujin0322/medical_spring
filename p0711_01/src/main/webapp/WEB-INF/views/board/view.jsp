@@ -46,7 +46,7 @@
         <td colspan="3" class="article">${boardDto.bcontent }</td>
       </tr>
       <tr>
-        <td colspan="3"<strong>파일첨부</strong></td>
+        <td colspan="3"><strong>파일첨부</strong></td>
       </tr>
       <tr>
       	<c:if test="${boardDto.bfile != null}">
