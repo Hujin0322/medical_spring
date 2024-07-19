@@ -262,12 +262,17 @@
 							let cdate;
 
 							//등록버튼 클릭
-							$(".replyBtn").click(function(){	
+							$(".replyBtn").click(function(){
 								//alert("등록버튼 클릭");
-								//alert($(".replynum").val());
-								//alert($(".replyType").val());
+								if(${sessionId == null}){
+									alert("로그인을 하셔야 댓글 작성이 가능합니다.");
+									location.href="/member/login";
+									$(".replyType").val("");
+									return false;
+								}
+									
 								let bno= "${nDto.bno}";
-								let id = "aaa";
+								let id = "${sessionId}";
 								let cpw = $(".replynum").val();
 								let ccontent = $(".replyType").val();
 								console.log("bno: "+bno);
@@ -310,7 +315,7 @@
 							});	//replyBtn
 							
 							//삭제버튼 클릭 (cno로 삭제)
-							$(".dBtn").click(function(){	
+							$(document).on("click",".dBtn", function(){
 								console.log("ul cno: "+$(this).closest('ul').attr('id'));
 								if(!confirm("댓글을 삭제하시겠습니까?")){
 									return false;
@@ -337,12 +342,13 @@
 								
 							});//dBtn
 							
-							$(".uBtn").click(function(){	
-								alert("수정버튼 클릭");
+							//수정버튼 클릭
+							$(document).on("click",".uBtn", function(){
+								alert("수정버튼을 클릭했습니다.");
 								console.log("ul cno: "+$(this).closest('ul').attr('id'));
 								
 								cno = $(this).closest('ul').attr('id');
-								id = 'aaa';
+								id = '${sessionId}';
 								cdate = $(this).closest('ul').children('.name').children('span').text();
 								ccontent = $(this).closest('ul').children('.txt').text();
 									
@@ -387,7 +393,7 @@
 								
 							//수정완료버튼 클릭
 							$(document).on("click",".updateBtn", function(){	
-								alert("수정 완료되었습니다.");
+								alert("댓글 수정 완료되었습니다.");
 								//데이터 확인
 								console.log("ul cno: "+$(this).closest('ul').attr('id'));
 								ccontent = $(this).closest('ul').children('.txt').children('.replyType').val();
@@ -396,16 +402,31 @@
 								console.log("update id: "+id);
 								console.log("update ccontent: "+ccontent);
 								
-								//데이터 넣기
-								/* let htmlData = " ";
-								htmlData += '<li class="name">'+id+'<span>['+cdate+']</span></li>';
-								htmlData += '<li class="txt">'+ccontent+'</li>';
-								htmlData += '<li class="btn">';
-								htmlData += '<a class="rebtn uBtn">수정</a> ';
-								htmlData += '<a class="rebtn dBtn">삭제</a>';
-								htmlData += '</li>';
-								
-								$("#"+cno).html(htmlData); */
+								//수정한 내용을 controller로 전송
+								$.ajax({
+									url:"/customer/commentBUpdate",
+									type: "post",
+									data:{"cno":cno, "id":id, "ccontent":ccontent},
+									dataType:"json",
+									success:function(data){
+										alert("댓글이 수정되었습니다.");
+										let htmlData= "";
+										htmlData += '<li class="name">'+data.id+' <span>['+moment(data.cdate).format("YYYY-MM-DD HH:mm:ss")+']</span></li>';
+										htmlData += '<li class="txt">'+data.ccontent+'</li>';
+										htmlData += '<li class="btn">';
+										htmlData += '<a class="rebtn uBtn">수정</a>&nbsp';
+										htmlData += '<a class="rebtn dBtn">삭제</a>';
+										htmlData += '</li>';
+										
+										//현재 위치에 수정 코드 입력
+										$("#"+cno).html(htmlData);
+									
+									},
+									error: function(){
+										alert("실패");
+									}
+									
+								});//ajax
 								
 							});//updateBtn
 							
@@ -427,16 +448,27 @@
 
 					<div class="replyBox">
 					<c:if test="${list.size() > 0 }">
-					<c:forEach items="${list }" var="cDto">
+						<c:forEach items="${list }" var="cDto">
 						<ul id="${cDto.cno }">
-							<li class="name">${cDto.id } <span>[${cDto.cdate }]</span></li>
-							<li class="txt">${cDto.ccontent }</li>
-							<li class="btn">
-								<a class="rebtn uBtn">수정</a>
-								<a class="rebtn dBtn">삭제</a>
-							</li>
+								<li class="name">${cDto.id } <span>[${cDto.cdate }]</span></li>
+							
+							<c:if test="${sessionId != cDto.id and cDto.cpw != null }">
+								<li class="txt">
+									<a class="passwordBtn"><span class="orange">※ 비밀글입니다.</span></a>
+								</li>
+							</c:if>
+							<c:if test="${sessionId != cDto.id and cDto.cpw == null }">
+								<li class="txt">${cDto.ccontent }</li>
+							</c:if>
+							<c:if test="${sessionId == cDto.id }">
+								<li class="txt">${cDto.ccontent }</li>
+								<li class="btn">
+									<a class="rebtn uBtn">수정</a>
+									<a class="rebtn dBtn">삭제</a>
+								</li>
+							</c:if>
 						</ul>
-					</c:forEach>
+						</c:forEach>
 					</c:if>
 					<c:if test="${list.size() == 0 }">
 						<ul>
@@ -444,19 +476,6 @@
 						</ul>
 					</c:if>
 					
-					<!-- 수정 폼 시작 -->
-					<!-- 
-						<ul>
-							<li class="name">jjabcde <span>[2014-03-04&nbsp;&nbsp;15:01:59]</span></li>
-							<li class="txt"><textarea class="replyType"></textarea></li>
-							<li class="btn">
-								<a href="#" class="rebtn">완료</a>
-								<a href="#" class="rebtn">취소</a>
-							</li>
-						</ul>
-					 -->
-					<!-- 수정 폼 끝 -->
-						
 					<!-- 비밀글 시작 -->
 					<!-- 
 						<ul>

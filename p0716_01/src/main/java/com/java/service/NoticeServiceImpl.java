@@ -49,12 +49,21 @@ public class NoticeServiceImpl implements NoticeService {
 		return cBDto;
 	}
 
-	@Override //하단 댓글 저장, 1개 가져오기
+	@Override //하단 댓글 삭제
 	public void deleteCommentB(CommentBDto commentBDto) {
 		System.out.println("service cno: "+commentBDto.getCno());
 		noticeDao.deleteCommentB(commentBDto);
 		return;
 	}
 
+	@Override //하단댓글 수정
+	public CommentBDto updateCommentB(CommentBDto commentBDto) {
+		System.out.println("service cno: "+commentBDto.getCno());
+		//하단댓글 수정
+		noticeDao.updateCommentB(commentBDto);
+		//하단댓글 1개 가져오기
+		CommentBDto cBDto = noticeDao.selectOneCommentB(commentBDto);
+		return cBDto;
+	}
 	
 }

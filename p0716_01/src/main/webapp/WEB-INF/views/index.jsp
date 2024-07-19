@@ -116,39 +116,6 @@ $(document).ready(function() {
 		<p class="btn" onclick="msiehide();"><img src="../images/ico/ico_close.gif" alt="닫기" /></p>
 	</div>
 </div>
-<!--//익스레이어팝업-->
-<!--IE 6,7,8 사용자에게 브라우저 업데이터 설명 Div 관련 스크립트-->
- <script type="text/javascript">
-
-     var settimediv = 200000; //지속시간(1000= 1초)
-     var msietimer;
-
-     $(document).ready(function () {
-         msiecheck();
-     });
-
-     var msiecheck = function () {
-         var browser = navigator.userAgent.toLowerCase();
-         if (browser.indexOf('msie 6') != -1 ||
-                browser.indexOf('msie 7') != -1 ||
-				 browser.indexOf('msie 8') != -1) {
-             msieshow();			 
-         }
-         else {
-             msiehide();
-         }
-     }
-
-     var msieshow = function () {
-        $("#ieUser").show();
-        msietimer = setTimeout("msiehide()", settimediv);
-     }
-
-     var msiehide = function () {
-		$("#ieUser").hide();
-        clearTimeout(msietimer);
-     }
-</script>
 
 <div id="allwrap">
 <div id="wrap">
@@ -168,8 +135,14 @@ $(document).ready(function() {
 			</div>
 			<div id="snb">
 				<ul>
-					<li><a href="#">LOGIN</a></li>
+					<c:if test="${sessionId == null }">
+					<li><a href="/member/login">LOGIN</a></li>
 					<li><a href="#">JOIN</a></li>
+					</c:if>
+					<c:if test="${sessionId != null }">
+					<li><a href="/member/logout">LOGOUT</a></li>
+					<li><a href="#">회원정보</a></li>
+					</c:if>
 					<li><a href="#">MY PAGE</a></li>
 					<li><a href="#">CART</a></li>
 				</ul>
